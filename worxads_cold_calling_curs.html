@@ -1,0 +1,457 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --wx-dark: #0d0d0d;
+    --wx-card: #141414;
+    --wx-border: rgba(255,255,255,0.08);
+    --wx-accent: #7c5cfc;
+    --wx-accent2: #a78bfa;
+    --wx-text: #f0f0f0;
+    --wx-muted: #888;
+    --wx-green: #22c55e;
+    --wx-red: #ef4444;
+    --wx-amber: #f59e0b;
+  }
+  body { background: transparent; font-family: var(--font-sans); }
+  .course-wrap { background: #0d0d0d; border-radius: 16px; border: 0.5px solid rgba(255,255,255,0.1); overflow: hidden; }
+  
+  .hero { background: #0d0d0d; padding: 2.5rem 2rem 2rem; border-bottom: 0.5px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; border-radius: 50%; background: rgba(124,92,252,0.12); }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,92,252,0.15); border: 0.5px solid rgba(124,92,252,0.4); border-radius: 100px; padding: 4px 12px; font-size: 11px; color: #a78bfa; margin-bottom: 1rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  .hero h1 { font-size: 22px; font-weight: 500; color: #fff; line-height: 1.3; margin-bottom: 0.5rem; }
+  .hero h1 span { color: var(--wx-accent2); }
+  .hero p { font-size: 13px; color: var(--wx-muted); line-height: 1.6; max-width: 480px; }
+  .hero-stats { display: flex; gap: 1.5rem; margin-top: 1.5rem; }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat-num { font-size: 20px; font-weight: 500; color: #fff; }
+  .stat-label { font-size: 11px; color: var(--wx-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .modules-nav { display: flex; gap: 2px; padding: 1rem 1.5rem; background: #0a0a0a; border-bottom: 0.5px solid rgba(255,255,255,0.06); overflow-x: auto; flex-wrap: wrap; gap: 4px; }
+  .mod-btn { flex-shrink: 0; background: transparent; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 5px 12px; font-size: 11px; color: #777; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .mod-btn:hover { border-color: rgba(124,92,252,0.5); color: #a78bfa; }
+  .mod-btn.active { background: rgba(124,92,252,0.2); border-color: rgba(124,92,252,0.6); color: #c4b5fd; }
+
+  .content { padding: 1.5rem; }
+  .module { display: none; }
+  .module.active { display: block; }
+
+  .mod-header { margin-bottom: 1.5rem; }
+  .mod-number { font-size: 11px; color: var(--wx-accent2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .mod-title { font-size: 18px; font-weight: 500; color: #fff; margin-bottom: 6px; }
+  .mod-desc { font-size: 13px; color: var(--wx-muted); line-height: 1.6; }
+
+  .card { background: #141414; border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 13px; font-weight: 500; color: #ddd; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card-title i { font-size: 15px; color: var(--wx-accent2); }
+  .card p, .card li { font-size: 13px; color: #999; line-height: 1.7; }
+  .card ul { padding-left: 1rem; }
+  .card li { margin-bottom: 4px; }
+  .card li strong { color: #ccc; font-weight: 500; }
+
+  .script-block { background: #0f0f0f; border: 0.5px solid rgba(124,92,252,0.2); border-radius: 10px; padding: 1.25rem; margin-top: 10px; }
+  .script-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--wx-accent2); margin-bottom: 10px; }
+  .script-line { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .who { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 100px; flex-shrink: 0; margin-top: 2px; }
+  .who.agent { background: rgba(124,92,252,0.2); color: #a78bfa; }
+  .who.client { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .who.receptionist { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .script-text { font-size: 13px; color: #ccc; line-height: 1.6; font-style: italic; }
+  .script-note { font-size: 11px; color: #555; line-height: 1.5; margin-top: 6px; background: rgba(255,255,255,0.03); border-radius: 6px; padding: 8px 10px; border-left: 2px solid rgba(124,92,252,0.4); }
+
+  .tip { background: rgba(34,197,94,0.06); border: 0.5px solid rgba(34,197,94,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 13px; color: #86efac; line-height: 1.6; }
+  .tip i { margin-right: 6px; color: var(--wx-green); }
+  .warning { background: rgba(245,158,11,0.06); border: 0.5px solid rgba(245,158,11,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 13px; color: #fcd34d; line-height: 1.6; }
+  .warning i { margin-right: 6px; }
+  .danger { background: rgba(239,68,68,0.06); border: 0.5px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 13px; color: #fca5a5; line-height: 1.6; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .col-card { background: #141414; border: 0.5px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 1rem; }
+  .col-card-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; font-weight: 500; }
+  .col-card.do .col-card-title { color: var(--wx-green); }
+  .col-card.dont .col-card-title { color: var(--wx-red); }
+  .col-card ul { list-style: none; padding: 0; }
+  .col-card li { font-size: 12px; color: #999; padding: 5px 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); display: flex; gap: 6px; align-items: flex-start; line-height: 1.5; }
+  .col-card li:last-child { border-bottom: none; }
+  .col-card.do li::before { content: '✓'; color: var(--wx-green); flex-shrink: 0; font-weight: 500; }
+  .col-card.dont li::before { content: '✕'; color: var(--wx-red); flex-shrink: 0; font-weight: 500; }
+
+  .objection { background: #141414; border: 0.5px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 1.25rem; margin-bottom: 0.75rem; }
+  .obj-q { font-size: 13px; color: #fbbf24; margin-bottom: 8px; font-weight: 500; }
+  .obj-a { font-size: 13px; color: #9ca3af; line-height: 1.6; }
+  .obj-a strong { color: #c4b5fd; font-weight: 500; }
+
+  .step-flow { display: flex; flex-direction: column; gap: 0; margin-bottom: 1rem; }
+  .step { display: flex; gap: 14px; align-items: flex-start; position: relative; }
+  .step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 36px; width: 1px; height: calc(100% - 8px); background: rgba(124,92,252,0.25); }
+  .step-num { width: 30px; height: 30px; border-radius: 50%; background: rgba(124,92,252,0.2); border: 0.5px solid rgba(124,92,252,0.5); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: #a78bfa; flex-shrink: 0; margin-top: 6px; }
+  .step-body { padding: 0.5rem 0 1.25rem; flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; color: #e0e0e0; margin-bottom: 4px; }
+  .step-text { font-size: 12px; color: #777; line-height: 1.6; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+  .kpi { background: #141414; border: 0.5px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 1rem; text-align: center; }
+  .kpi-val { font-size: 22px; font-weight: 500; color: #a78bfa; }
+  .kpi-label { font-size: 11px; color: #555; margin-top: 3px; }
+
+  .pill { display: inline-block; background: rgba(124,92,252,0.15); border: 0.5px solid rgba(124,92,252,0.3); color: #c4b5fd; font-size: 11px; border-radius: 100px; padding: 2px 10px; margin: 2px; }
+
+  .progress-bar-wrap { background: #1a1a1a; border-radius: 100px; height: 3px; margin-top: 2px; }
+  .progress-bar { height: 3px; border-radius: 100px; background: linear-gradient(90deg, #7c5cfc, #a78bfa); }
+
+  .done-btn { width: 100%; margin-top: 1rem; background: rgba(124,92,252,0.15); border: 0.5px solid rgba(124,92,252,0.4); color: #c4b5fd; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+  .done-btn:hover { background: rgba(124,92,252,0.25); }
+
+  .footer-nav { display: flex; justify-content: space-between; padding: 1rem 1.5rem; border-top: 0.5px solid rgba(255,255,255,0.06); background: #0a0a0a; }
+  .nav-btn { background: transparent; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 16px; font-size: 12px; color: #888; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+  .nav-btn:hover { border-color: rgba(124,92,252,0.5); color: #a78bfa; }
+  .nav-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+  @media (max-width: 500px) { .two-col { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: 1fr 1fr; } .hero-stats { flex-wrap: wrap; gap: 1rem; } }
+</style>
+
+<div class="course-wrap">
+  <div class="hero">
+    <div class="hero-badge"><i class="ti ti-phone-call" aria-hidden="true"></i> Training intern · WorxAds</div>
+    <h1>Cold Calling Masterclass<br><span>Cum vinzi website-uri la telefon</span></h1>
+    <p>Cursul complet pentru agenții de vânzări WorxAds. De la primul apel până la demo-ul trimis pe WhatsApp.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label">Module</span></div>
+      <div class="stat"><span class="stat-num">12+</span><span class="stat-label">Scripturi</span></div>
+      <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Practic</span></div>
+    </div>
+  </div>
+
+  <div class="modules-nav" id="nav">
+    <button class="mod-btn active" onclick="goTo(0)">01 · Mindset</button>
+    <button class="mod-btn" onclick="goTo(1)">02 · Înainte de apel</button>
+    <button class="mod-btn" onclick="goTo(2)">03 · Receptionist</button>
+    <button class="mod-btn" onclick="goTo(3)">04 · Apelul cu decizia</button>
+    <button class="mod-btn" onclick="goTo(4)">05 · Obiecții</button>
+    <button class="mod-btn" onclick="goTo(5)">06 · Follow-up WhatsApp</button>
+  </div>
+
+  <div class="content">
+
+    <!-- MODULE 0 -->
+    <div class="module active" id="mod-0">
+      <div class="mod-header">
+        <div class="mod-number">Modulul 01</div>
+        <div class="mod-title">Mindset & Regulile de bază</div>
+        <div class="mod-desc">Înainte să ridici receptorul, trebuie să înțelegi exact ce face un apel bun și ce îl face să eșueze.</div>
+      </div>
+
+      <div class="tip"><i class="ti ti-bulb" aria-hidden="true"></i><strong>Regula #1 de aur:</strong> Scopul apelului NU este să vinzi un website. Scopul apelului este să câștigi permisiunea de a trimite un demo pe WhatsApp.</div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-target" aria-hidden="true"></i> Ce înseamnă asta în practică?</div>
+        <p>Fiecare apel are un singur obiectiv: <strong style="color:#c4b5fd">obținerea numărului de WhatsApp</strong> al decidentului sau <strong style="color:#c4b5fd">confirmarea că poate fi contactat pe WhatsApp</strong>. Nu vinzi la telefon. Nu prezinți pachete. Nu negociezi prețuri. Vinzi doar pasul următor.</p>
+      </div>
+
+      <div class="step-flow">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Ești un consultant, nu un vânzător</div><div class="step-text">Vorbești calm, nu nervos. Nu ești disperat. Ai ceva valoros să oferi — o prezență digitală mai bună pentru afacerea lor.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Tonul face 80% din apel</div><div class="step-text">Zâmbește în timp ce vorbești — se aude. Vorbește rar, clar, cu pauze. Nu grăbi frazele de parcă ai vrea să termini rapid.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Refuzul nu e personal</div><div class="step-text">La fiecare 10 apeluri, 7-8 vor spune nu. E normal. Fiecare „nu" te apropie de un „da". Notează obiecția și treci la urmă torul.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Nu improviza scriptul</div><div class="step-text">Scriptul există pentru că funcționează. Personalizează-l, dar nu elimina structura. Improvizația fără bază duce la apeluri haotice.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Fiecare zi e un număr</div><div class="step-text">Minim 30 de apeluri pe zi per agent. Nu 30 de „încercări". 30 de apeluri efectiv realizate. Din 30, dacă obții 3-5 demo-uri trimise, ziua e bună.</div></div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="col-card do">
+          <div class="col-card-title"><i class="ti ti-check" aria-hidden="true"></i> Faci</div>
+          <ul>
+            <li>Ești pregătit înainte de apel</li>
+            <li>Zâmbești și vorbești calm</li>
+            <li>Asculți activ clientul</li>
+            <li>Notezi fiecare apel</li>
+            <li>Ceri permisiunea pentru WhatsApp</li>
+            <li>Respecți dacă spune nu</li>
+          </ul>
+        </div>
+        <div class="col-card dont">
+          <div class="col-card-title"><i class="ti ti-x" aria-hidden="true"></i> Nu faci</div>
+          <ul>
+            <li>Nu citești robotizat scriptul</li>
+            <li>Nu insisti după un refuz clar</li>
+            <li>Nu dai prețuri la primul apel</li>
+            <li>Nu vorbești prea repede</li>
+            <li>Nu suni de pe număr ascuns</li>
+            <li>Nu promite termene nerealiste</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-val">30+</div><div class="kpi-label">Apeluri / zi</div></div>
+        <div class="kpi"><div class="kpi-val">~15%</div><div class="kpi-label">Rată demo trimis</div></div>
+        <div class="kpi"><div class="kpi-val">~5%</div><div class="kpi-label">Rată conversie</div></div>
+      </div>
+    </div>
+
+    <!-- MODULE 1 -->
+    <div class="module" id="mod-1">
+      <div class="mod-header">
+        <div class="mod-number">Modulul 02</div>
+        <div class="mod-title">Pregătirea înainte de apel</div>
+        <div class="mod-desc">2 minute de cercetare înainte de apel pot dubla rata de succes. Iată exact ce faci.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-search" aria-hidden="true"></i> Ce verifici înainte să suni</div>
+        <ul>
+          <li><strong>Au website?</strong> Caută pe Google numele afacerii. Dacă nu au deloc — bingo. Dacă au, verifică dacă e vechi/lent/mobil-broken.</li>
+          <li><strong>Ce tip de afacere e?</strong> Cabinet dentar, salon, restaurant, firma de construcții, avocați, etc. Asta îți dă unghiul de abordare.</li>
+          <li><strong>Cine e proprietarul?</strong> Caută pe Facebook sau Instagram afacerea. Deseori proprietarul e și pe pagina business-ului.</li>
+          <li><strong>Au recenzii pe Google Maps?</strong> Înseamnă că îi pasă de imagine digitală — mai receptiv la pitch.</li>
+          <li><strong>Notează numele afacerii și un detaliu specific</strong> pe care îl vei folosi în apel pentru personalizare.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-list-check" aria-hidden="true"></i> Check-list pre-apel (30 secunde)</div>
+        <ul>
+          <li>Ai numărul de telefon și numele afacerii notate</li>
+          <li>Știi dacă au sau nu website</li>
+          <li>Ai scriptul deschis în față</li>
+          <li>Ești într-un loc liniștit, fără zgomot</li>
+          <li>Ai unde nota (telefon sau caiet)</li>
+          <li>Ești hidratat, ai vocea clară</li>
+        </ul>
+      </div>
+
+      <div class="tip"><i class="ti ti-flame" aria-hidden="true"></i> <strong>Cel mai bun moment să suni:</strong> Marți–Joi, între 10:00–12:00 și 14:30–17:00. Evită luni dimineața (haos) și vineri după-amiaza (weekend mode).</div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-folder" aria-hidden="true"></i> Categorii de afaceri prioritare WorxAds</div>
+        <p style="margin-bottom: 10px;">Concentrează-te pe aceste sectoare — au cel mai mare potențial și cel mai mare deficit digital:</p>
+        <div>
+          <span class="pill">Cabinete dentare</span>
+          <span class="pill">Saloane de înfrumusețare</span>
+          <span class="pill">Firme de construcții</span>
+          <span class="pill">Avocați / notari</span>
+          <span class="pill">Restaurante locale</span>
+          <span class="pill">Auto service</span>
+          <span class="pill">Pensiuni / cazări</span>
+          <span class="pill">Contabili / firme</span>
+          <span class="pill">Kinetoterapeuți</span>
+          <span class="pill">Florării</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-notebook" aria-hidden="true"></i> Cum notezi apelurile</div>
+        <p>Creează un tabel simplu cu: <strong style="color:#c4b5fd">Număr / Afacere / Data / Rezultat / Următor pas.</strong> Rezultatele posibile: Demo trimis ✓ / Refuzat / Callback programat / Recepționist blocat / Necontactat. La final de zi, raportezi numărul total de apeluri și demo-uri trimise.</p>
+      </div>
+    </div>
+
+    <!-- MODULE 2 -->
+    <div class="module" id="mod-2">
+      <div class="mod-header">
+        <div class="mod-number">Modulul 03</div>
+        <div class="mod-title">Cum treci de recepționist</div>
+        <div class="mod-desc">Recepționistul nu e dușmanul tău. E un filtru. Tehnicile de mai jos te ajută să ajungi la decident fără să minți.</div>
+      </div>
+
+      <div class="warning"><i class="ti ti-alert-triangle" aria-hidden="true"></i> <strong>Regula importantă:</strong> Nu te prezenta ca „agent de vânzări" sau „ofertă". Folosește cuvinte neutre: „colaborare", „proiect", „o propunere". Nu minți, dar nu da toate detaliile din prima.</div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-phone" aria-hidden="true"></i> Script #1 — Varianta directă și simplă</div>
+        <div class="script-block">
+          <div class="script-label">Transcript apel</div>
+          <div class="script-line"><span class="who receptionist">Rec.</span><span class="script-text">„Bună ziua, clinica Dr. Ionescu, cu ce vă pot ajuta?"</span></div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Bună ziua! Mă numesc [Prenume], sun de la WorxAds. Aș dori să vorbesc cu domnul/doamna doctor Ionescu, vă rog — e vorba despre site-ul clinicii."</span></div>
+          <div class="script-line"><span class="who receptionist">Rec.</span><span class="script-text">„Ce anume doriți?"</span></div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Am pregătit o propunere vizuală pentru clinică și aș vrea să i-o prezint direct. E vorba de 2-3 minute. Îl pot deranja un moment?"</span></div>
+          <div class="script-note">Dacă spune că nu e disponibil: „Înțeleg, la ce oră l-aș putea suna direct? Sau are un număr de WhatsApp pe care i-aș putea trimite propunerea?"</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-phone" aria-hidden="true"></i> Script #2 — Varianta „am trimis ceva"</div>
+        <div class="script-block">
+          <div class="script-label">Transcript apel</div>
+          <div class="script-line"><span class="who receptionist">Rec.</span><span class="script-text">„Bună ziua..."</span></div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Bună ziua, mă numesc [Prenume] de la WorxAds. Am pregătit o demonstrație pentru site-ul [Numele Clinicii] — vroiam să știu dacă a ajuns la proprietar. Cu cine aș putea vorbi?"</span></div>
+          <div class="script-note">Tehnica „am pregătit ceva" creează impresia că există deja ceva concret — și implicit o obligație de a verifica. E adevărat: ai pregătit un demo generic adaptat sectorului lor.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-shield" aria-hidden="true"></i> Ce faci dacă recepționistul blochează total</div>
+        <ul>
+          <li><strong>Opțiunea 1:</strong> „Înțeleg. Îmi puteți da un email sau WhatsApp pe care să trimit propunerea direct?"</li>
+          <li><strong>Opțiunea 2:</strong> Notează afacerea și sună după 2-3 zile la o altă oră. Schimbă ce spui — recepționist poate fi alt om.</li>
+          <li><strong>Opțiunea 3:</strong> Caută proprietarul pe LinkedIn, Facebook sau Instagram și contactează-l direct.</li>
+          <li><strong>Opțiunea 4:</strong> Treci mai departe. Nu pierde mai mult de 3 încercări pe aceeași afacere.</li>
+        </ul>
+      </div>
+
+      <div class="tip"><i class="ti ti-star" aria-hidden="true"></i> <strong>Pro tip:</strong> La unele afaceri mici (saloane, auto service, florării), proprietarul chiar răspunde el la telefon. Recunoști după ton — sari direct la scriptul cu decizia.</div>
+    </div>
+
+    <!-- MODULE 3 -->
+    <div class="module" id="mod-3">
+      <div class="mod-header">
+        <div class="mod-number">Modulul 04</div>
+        <div class="mod-title">Apelul cu decidentul</div>
+        <div class="mod-desc">Ai ajuns la proprietar. Ai 60-90 de secunde să captezi interesul și să câștigi permisiunea pentru WhatsApp. Iată cum.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-layout-grid" aria-hidden="true"></i> Structura apelului perfect</div>
+        <div class="step-flow" style="margin-top: 10px;">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Deschidere (5 sec)</div><div class="step-text">Prezentare scurtă + verificare disponibilitate. Nu intra direct în pitch.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Motiv + relevantă (15 sec)</div><div class="step-text">De ce suni TU pe EI, nu pe altcineva. Personalizare specifică domeniului.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Valoare concretă (20 sec)</div><div class="step-text">Ce câștigă ei. Nu ce faci tu. Beneficiu clar, nu tehnicitate.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Cererea demo (10 sec)</div><div class="step-text">Soliciți să trimiți demonstrația pe WhatsApp. Simplu, fără presiune.</div></div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Gestionarea răspunsului</div><div class="step-text">Dacă da — confirmi numărul și dai ETA. Dacă obiecție — modulul 05.</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-phone" aria-hidden="true"></i> Script complet — Cabinet dentar (fără website)</div>
+        <div class="script-block">
+          <div class="script-label">Apel principal</div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Bună ziua, domnule doctor Ionescu! Mă numesc [Prenume], sun de la WorxAds — vă deranjez un moment sau vă sun la un moment nepotrivit?"</span></div>
+          <div class="script-line"><span class="who client">Client</span><span class="script-text">„Nu, spuneți..."</span></div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Mulțumesc. Am observat că Clinica [Nume] nu are un website — și pentru un cabinet de calitate ca al dumneavoastră, asta înseamnă că potențialii pacienți care vă caută online nu vă găsesc sau ajung la concurență."</span></div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Noi la WorxAds facem website-uri profesionale pentru cabinete dentare — cu programare online, recenzii integrate și prezentare servicii — livrate în 7 zile. Am pregătit o demonstrație vizuală adaptată pentru un cabinet ca al dumneavoastră."</span></div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„V-aș trimite-o pe WhatsApp să o vedeți în 2 minute, fără nicio obligație. Aveți un număr pe care să vi-o trimit?"</span></div>
+          <div class="script-note">Dacă dă numărul: „Perfect, vă trimit acum. În câteva ore verificați și dacă aveți întrebări mă sunați oricând. Vă mulțumesc, o zi bună!"</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-phone" aria-hidden="true"></i> Script — Afacere cu website vechi / prost</div>
+        <div class="script-block">
+          <div class="script-label">Varianta website existent</div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Bună ziua! Mă numesc [Prenume] de la WorxAds. Am vizitat site-ul [Afacere] și mi-am dat seama că are câteva probleme tehnice — nu se încarcă bine pe telefon și lipsesc câteva secțiuni cheie care aduc clienți."</span></div>
+          <div class="script-line"><span class="who agent">Agent</span><span class="script-text">„Am făcut o variantă îmbunătățită — un mockup rapid — ca să vedeți cum ar putea arăta. Pot să vi-l trimit pe WhatsApp?"</span></div>
+          <div class="script-note">Fraza „am vizitat site-ul și am observat..." arată că ai depus efort. Nu ești un apel random — ești specific. Asta schimbă tot tonul conversației.</div>
+        </div>
+      </div>
+
+      <div class="tip"><i class="ti ti-check" aria-hidden="true"></i> <strong>Regula celor 3 secunde:</strong> Dacă în primele 3 secunde nu captezi atenția, persoana se gândește deja cum să scape de tine. Deschide cu ceva specific lor, nu cu „sun cu o ofertă".</div>
+    </div>
+
+    <!-- MODULE 4 -->
+    <div class="module" id="mod-4">
+      <div class="mod-header">
+        <div class="mod-number">Modulul 05</div>
+        <div class="mod-title">Gestionarea obiecțiilor</div>
+        <div class="mod-desc">Nu există apel fără obiecție. Iată cele mai frecvente și cum le răspunzi calm, fără să presezi.</div>
+      </div>
+
+      <div class="objection">
+        <div class="obj-q">„Nu am nevoie de website."</div>
+        <div class="obj-a">„Înțeleg. Mulți clienți de-ai noștri spuneau același lucru înainte să vadă câți oameni îi caută online și ajung la concurență. <strong>Nu vă cer nimic — vreau doar să vă trimit o demonstrație vizuală în 2 minute pe WhatsApp.</strong> Dacă nu vă interesează după ce o vedeți, nicio problemă."</div>
+      </div>
+
+      <div class="objection">
+        <div class="obj-q">„Am deja un website."</div>
+        <div class="obj-a">„Știu, l-am văzut. <strong>Tocmai de aceea sun</strong> — am observat că nu se încarcă bine pe telefon, iar azi peste 70% din căutări sunt de pe mobil. V-aș arăta cum ar putea arăta o versiune modernizată. Mă autorizați să vă trimit pe WhatsApp?"</div>
+      </div>
+
+      <div class="objection">
+        <div class="obj-q">„Nu am timp acum."</div>
+        <div class="obj-a">„Absolut, nu vă rețin. <strong>Pot să vă trimit demonstrația pe WhatsApp</strong> și o priviți când aveți 2 minute libere? La ce număr?"</div>
+      </div>
+
+      <div class="objection">
+        <div class="obj-q">„Cât costă?"</div>
+        <div class="obj-a">„Prețurile variază în funcție de ce anume aveți nevoie — de la un site simplu de prezentare până la platforme cu programare online. <strong>Vă trimit demonstrația pe WhatsApp</strong> cu câteva opțiuni și vedeți ce se potrivește. La ce număr vă pot trimite?"</div>
+      </div>
+
+      <div class="objection">
+        <div class="obj-q">„Am mai primit astfel de apeluri, nu mă interesează."</div>
+        <div class="obj-a">„Înțeleg complet și apreciez sinceritatea. <strong>Diferența față de alte apeluri</strong> e că noi nu vindem la telefon — pur și simplu vă trimit o demonstrație vizuală realizată specific pentru domeniul dumneavoastră. Dacă după ce o vedeți nu vă interesează, nu vă mai contactez. OK?"</div>
+      </div>
+
+      <div class="objection">
+        <div class="obj-q">„Trimiteți pe email."</div>
+        <div class="obj-a">„Desigur, notez adresa. <strong>Preferați și pe WhatsApp?</strong> De obicei răspunsul pe WhatsApp vine mult mai repede și puteți vedea demo-ul instant. Dar dacă preferați emailul, cu plăcere — la ce adresă?"</div>
+      </div>
+
+      <div class="objection">
+        <div class="obj-q">„Vorbiți cu soțul / angajatul meu."</div>
+        <div class="obj-a">„Înțeleg. Decizia finală e a dumneavoastră sau a soțului? <strong>Aș putea vorbi și cu dumnealui</strong> — mi-ar putea da un număr? Sau vă pot trimite demonstrația vouă și o discutați împreună."</div>
+      </div>
+
+      <div class="danger"><i class="ti ti-x" aria-hidden="true"></i> <strong>Nu face niciodată:</strong> Nu insista după 2 obiecții consecutive clare. „Nu mă interesează, nu sunați" = închizi politicos și treci la urmă torul. Insistența agresivă strică reputația WorxAds.</div>
+    </div>
+
+    <!-- MODULE 5 -->
+    <div class="module" id="mod-5">
+      <div class="mod-header">
+        <div class="mod-number">Modulul 06</div>
+        <div class="mod-title">Follow-up pe WhatsApp</div>
+        <div class="mod-desc">Demo-ul trimis pe WhatsApp e locul unde se câștigă sau se pierde vânzarea. Iată cum gestionezi fiecare scenariu.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-brand-whatsapp" aria-hidden="true"></i> Mesajul inițial după apel (trimis în max 5 min)</div>
+        <div class="script-block">
+          <div class="script-label">Template WhatsApp — primul mesaj</div>
+          <div class="script-line"><span class="who agent">Tu</span><span class="script-text">„Bună ziua, domnule/doamnă [Nume]! Sunt [Prenume] de la WorxAds — tocmai am vorbit la telefon. Vă trimit demonstrația promisă 👇</span></div>
+          <div class="script-line"><span class="who agent">Tu</span><span class="script-text">[link demo / video / screenshot]</span></div>
+          <div class="script-line"><span class="who agent">Tu</span><span class="script-text">„Acesta e un exemplu de website pentru [tipul afacerii]. Poate fi personalizat complet cu datele și imaginile dumneavoastră. Dacă aveți întrebări sau doriți să discutăm detalii, sunt disponibil oricând. O zi bună! 🙏"</span></div>
+          <div class="script-note">Trimite-l în 3 mesaje separate, nu un singur bloc de text. Se citește mai ușor și arată mai conversațional.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-clock" aria-hidden="true"></i> Cronologia follow-up-ului</div>
+        <div class="step-flow" style="margin-top:10px;">
+          <div class="step"><div class="step-num">0</div><div class="step-body"><div class="step-title">Zi 0 — Imediat după apel</div><div class="step-text">Trimiți demo-ul + mesajul de însoțire. Maxim 5 minute de la apel.</div></div></div>
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Zi 2 — Follow-up blând</div><div class="step-text">„Bună ziua! Am vrut să verific dacă ați avut ocazia să vedeți demonstrația. Aveți vreo întrebare?"</div></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Zi 5 — Follow-up cu valoare</div><div class="step-text">Trimiți un scurt beneficiu sau stat: „Știați că 68% din clienți caută un medic online înainte să sune? Un site profesional vă pune pe hartă."</div></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Zi 10 — Ultimul mesaj</div><div class="step-text">„Dacă nu este momentul potrivit acum, înțeleg complet. Mă puteți contacta oricând. Mult succes!"</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-message-circle" aria-hidden="true"></i> Scenarii de răspuns și ce faci</div>
+        <ul>
+          <li><strong style="color:#4ade80">„Da, mi-a plăcut, cât costă?"</strong> — Felicitări! Trimiți oferta cu 2-3 pachete clare și propui un apel sau întâlnire scurtă.</li>
+          <li><strong style="color:#fbbf24">„Mă mai gândesc."</strong> — „Firesc! Dacă aveți vreo întrebare pe parcurs, sunt aici." Revii în zi 5.</li>
+          <li><strong style="color:#f87171">„Nu mă interesează."</strong> — „Înțeleg, vă mulțumesc pentru timp. O zi bună!" Marchează ca Refuzat și treci mai departe.</li>
+          <li><strong style="color:#a78bfa">Nu răspunde deloc.</strong> — Follow-up la zi 2, zi 5, zi 10. Dacă după zi 10 nu răspunde — îl marchezi ca inactiv.</li>
+        </ul>
+      </div>
+
+      <div class="tip"><i class="ti ti-trophy" aria-hidden="true"></i> <strong>Obiectivul final:</strong> Din demo-urile trimise, ~20-30% vor răspunde. Din cei care răspund, ~30-40% devin clienți dacă propunerea și prețul sunt corecte. Fiecare demo trimis = un pas concret spre vânzare.</div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> Target săptămânal per agent</div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-val">150</div><div class="kpi-label">Apeluri / săpt.</div></div>
+          <div class="kpi"><div class="kpi-val">20+</div><div class="kpi-label">Demo-uri trimise</div></div>
+          <div class="kpi"><div class="kpi-val">1-2</div><div class="kpi-label">Clienți noi / săpt.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-nav">
+    <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled><i class="ti ti-arrow-left" aria-hidden="true"></i> Anterior</button>
+    <span style="font-size:12px; color:#444; align-self:center;" id="prog-label">1 / 6</span>
+    <button class="nav-btn" id="btn-next" onclick="navigate(1)">Următor <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+  </div>
+</div>
+
+<script>
+  let cur = 0;
+  const total = 6;
+  function goTo(i) {
+    document.getElementById('mod-' + cur).classList.remove('active');
+    document.querySelectorAll('.mod-btn')[cur].classList.remove('active');
+    cur = i;
+    document.getElementById('mod-' + cur).classList.add('active');
+    document.querySelectorAll('.mod-btn')[cur].classList.add('active');
+    document.getElementById('btn-prev').disabled = cur === 0;
+    document.getElementById('btn-next').disabled = cur === total - 1;
+    document.getElementById('prog-label').textContent = (cur+1) + ' / ' + total;
+  }
+  function navigate(dir) { goTo(Math.max(0, Math.min(total-1, cur+dir))); }
+</script>
